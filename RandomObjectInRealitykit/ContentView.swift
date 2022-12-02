@@ -6,17 +6,30 @@
 //
 
 import SwiftUI
+import RealityKit
 
 struct ContentView: View {
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundColor(.accentColor)
-            Text("Hello, world!")
-        }
-        .padding()
+        ARViewContainer().edgesIgnoringSafeArea(.all)
     }
+}
+
+struct ARViewContainer: UIViewRepresentable {
+    func makeUIView(context: Context) -> ARView {
+        let arView = ARView(frame: .zero)
+        
+        let newAnchor = AnchorEntity(plane: .horizontal)
+        let newBox = ModelEntity(mesh: .generateBox(size: 0.3))
+        newBox.generateCollisionShapes(recursive: true)
+        newAnchor.addChild(newBox)
+        arView.scene.addAnchor(newAnchor)
+        
+        arView.installGestures(for: newBox)
+        
+        return arView
+    }
+    
+    func updateUIView(_ uiView: ARView, context: Context) {}
 }
 
 struct ContentView_Previews: PreviewProvider {
