@@ -8,9 +8,20 @@
 import SwiftUI
 import RealityKit
 
+let newBox = ModelEntity(mesh: .generateBox(size: 1))
+
 struct ContentView: View {
+    @State var value: Float = 1
+    
     var body: some View {
-        ARViewContainer().edgesIgnoringSafeArea(.all)
+        VStack {
+            ARViewContainer().edgesIgnoringSafeArea(.all)
+            Slider(value: Binding(get: { value }, set: { newValue in
+                newBox.setScale(SIMD3(repeating: newValue), relativeTo: nil)
+                value = newValue
+            }), in: 0.1...2).padding(.horizontal)
+        }
+        
     }
 }
 
@@ -23,7 +34,6 @@ struct ARViewContainer: UIViewRepresentable {
         #endif
         
         let newAnchor = AnchorEntity(world: [0, 0, -1])
-        let newBox = ModelEntity(mesh: .generateBox(size: 1))
         newBox.generateCollisionShapes(recursive: true)
         newAnchor.addChild(newBox)
         arView.scene.addAnchor(newAnchor)
