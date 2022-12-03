@@ -33,12 +33,10 @@ struct ARViewContainer: UIViewRepresentable {
         let arView = ARView(frame: .zero, cameraMode: .nonAR, automaticallyConfigureSession: false)
         #endif
         
-        let newAnchor = AnchorEntity(world: [0, 0, -1])
-        newBox.generateCollisionShapes(recursive: true)
-        newAnchor.addChild(newBox)
-        arView.scene.addAnchor(newAnchor)
-        
-        arView.installGestures(.rotation, for: newBox)
+        let anchor = AnchorEntity(world: .zero)
+        newBox.position = [0, 0, -1]
+        anchor.addChild(newBox)
+        arView.scene.addAnchor(anchor)
         
         return arView
     }
