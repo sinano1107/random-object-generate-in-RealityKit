@@ -8,55 +8,45 @@
 import SwiftUI
 import RealityKit
 
-let cameraAnchor = AnchorEntity(world: .zero)
 let camera = PerspectiveCamera()
-let newAnchor = AnchorEntity(world: .zero)
-let newBox = ModelEntity(mesh: .generateBox(size: 0.2))
 
-var mouse: simd_float2 = [0, 0]
-var nowPos = camera.position
-var pos: simd_float3 = [0, 0, 0]
-var prevX: CGFloat?
-var prevY: CGFloat?
-var prevTime: Date?
-func orbit(value: DragGesture.Value) {
-    let deltaTime = prevTime != nil ? value.time.timeIntervalSince(prevTime!) : 0
-    prevTime = value.time
-    
-    let deltaX = prevX != nil ? Float(value.location.x - prevX!) : 0
-    let deltaY = prevY != nil ? Float(value.location.y - prevY!) : 0
-    prevX = value.location.x
-    prevY = value.location.y
+var radius: Float = 2
+var dragspeed: Float = 0.01
+var rotationAngle: Float = 0
+var inclinationAngle: Float = 0
+var dragstart_rotation: Float = 0
+var dragstart_inclination: Float = 0
 
-    mouse += vector2(deltaX, deltaY) * Float(deltaTime) * 0.3
-    print(mouse)
-    
-    mouse.y = min(max(mouse.y, 0), 1)
-    
-    pos.x = -1 * sin(mouse.y * .pi) * cos(mouse.x * .pi)
-    pos.y = -1 * cos(mouse.y * .pi)
-    pos.z = -1 * sin(mouse.y * .pi) * sin(mouse.x * .pi)
-    
-    camera.look(at: newBox.position(relativeTo: nil), from: pos, relativeTo: nil)
+@MainActor private func updateCamera() {
+    let translationTransform = Transform(scale: .one,
+                                         rotation: simd_quatf(),
+                                         translation: SIMD3<Float>(0, 0, radius))
+    let combinedRotationTransform: Transform = .init(pitch: inclinationAngle, yaw: rotationAngle, roll: 0)
+    let computed_transform = matrix_identity_float4x4 * combinedRotationTransform.matrix * translationTransform.matrix
+    camera.transform = Transform(matrix: computed_transform)
 }
 
 struct ContentView: View {
-    @State var value: Float = 1
-    
     var body: some View {
-        VStack {
-            ARViewContainer()
-                .edgesIgnoringSafeArea(.all)
-                .gesture(DragGesture().onChanged(orbit).onEnded({ value in
-                    prevX = nil
-                    prevY = nil
-                    prevTime = nil
-                }))
-            Slider(value: Binding(get: { value }, set: { newValue in
-                newBox.setScale(SIMD3(repeating: newValue), relativeTo: nil)
-                value = newValue
-            }), in: 0.1...2).padding(.horizontal)
-        }
+        ARViewContainer()
+            .edgesIgnoringSafeArea(.all)
+            .gesture(DragGesture().onChanged({ value in
+                let deltaX = Float(value.location.x - value.startLocation.x)
+                let deltaY = Float(value.location.y - value.startLocation.y)
+                rotationAngle = dragstart_rotation - deltaX * dragspeed
+                inclinationAngle = dragstart_inclination - deltaY * dragspeed
+                if inclinationAngle > Float.pi / 2 {
+                    inclinationAngle = Float.pi / 2
+                }
+                if inclinationAngle < -Float.pi / 2 {
+                    inclinationAngle = -Float.pi / 2
+                }
+
+                updateCamera()
+            }).onEnded({ _ in
+                dragstart_rotation = rotationAngle
+                dragstart_inclination = inclinationAngle
+            }))
     }
 }
 
@@ -67,14 +57,13 @@ struct ARViewContainer: UIViewRepresentable {
         #else
         let arView = ARView(frame: .zero, cameraMode: .nonAR, automaticallyConfigureSession: false)
         #endif
-
-        cameraAnchor.addChild(camera)
-        arView.scene.addAnchor(cameraAnchor)
-
-        newAnchor.addChild(newBox)
-        arView.scene.addAnchor(newAnchor)
         
-        arView.installGestures(.rotation, for: newBox)
+        let anchor = AnchorEntity(world: .zero)
+        let newBox = ModelEntity(mesh: .generateBox(size: 0.5))
+        camera.position = [0, 0, 2]
+        anchor.addChild(newBox)
+        anchor.addChild(camera)
+        arView.scene.addAnchor(anchor)
         
         return arView
     }
