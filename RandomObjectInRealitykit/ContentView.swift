@@ -8,11 +8,45 @@
 import SwiftUI
 import RealityKit
 
-let newBox = ModelEntity(mesh: .generateBox(size: 1))
+let camera = PerspectiveCamera()
+
+var radius: Float = 2
+var dragspeed: Float = 0.01
+var rotationAngle: Float = 0
+var inclinationAngle: Float = 0
+var dragstart_rotation: Float = 0
+var dragstart_inclination: Float = 0
+
+@MainActor private func updateCamera() {
+    let translationTransform = Transform(scale: .one,
+                                         rotation: simd_quatf(),
+                                         translation: SIMD3<Float>(0, 0, radius))
+    let combinedRotationTransform: Transform = .init(pitch: inclinationAngle, yaw: rotationAngle, roll: 0)
+    let computed_transform = matrix_identity_float4x4 * combinedRotationTransform.matrix * translationTransform.matrix
+    camera.transform = Transform(matrix: computed_transform)
+}
 
 struct ContentView: View {
     var body: some View {
-        ARViewContainer().edgesIgnoringSafeArea(.all)
+        ARViewContainer()
+            .edgesIgnoringSafeArea(.all)
+            .gesture(DragGesture().onChanged({ value in
+                let deltaX = Float(value.location.x - value.startLocation.x)
+                let deltaY = Float(value.location.y - value.startLocation.y)
+                rotationAngle = dragstart_rotation - deltaX * dragspeed
+                inclinationAngle = dragstart_inclination - deltaY * dragspeed
+                if inclinationAngle > Float.pi / 2 {
+                    inclinationAngle = Float.pi / 2
+                }
+                if inclinationAngle < -Float.pi / 2 {
+                    inclinationAngle = -Float.pi / 2
+                }
+
+                updateCamera()
+            }).onEnded({ _ in
+                dragstart_rotation = rotationAngle
+                dragstart_inclination = inclinationAngle
+            }))
     }
 }
 
@@ -25,8 +59,10 @@ struct ARViewContainer: UIViewRepresentable {
         #endif
         
         let anchor = AnchorEntity(world: .zero)
-        newBox.position = [0, 0, -1]
+        let newBox = ModelEntity(mesh: .generateBox(size: 0.5))
+        camera.position = [0, 0, 2]
         anchor.addChild(newBox)
+        anchor.addChild(camera)
         arView.scene.addAnchor(anchor)
         
         return arView
