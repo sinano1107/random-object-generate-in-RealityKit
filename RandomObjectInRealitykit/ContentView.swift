@@ -10,19 +10,22 @@ import RealityKit
 
 struct ContentView: View {
     @State var model = ModelEntity(mesh: .generateBox(size: 0.5))
-    @State var isBox = true
     
     var body: some View {
         VStack {
             OrbitView(model: $model)
                 .edgesIgnoringSafeArea(.all)
-            Button("トグル") {
-                isBox.toggle()
-                if isBox {
-                    model = ModelEntity(mesh: .generateBox(size: 0.5))
-                } else {
-                    model = ModelEntity(mesh: .generateSphere(radius: 0.5))
-                }
+            
+            Button("三角形を生成") {
+                let positions: [SIMD3<Float>] = [[-1, -1, 0], [1, -1, 0], [0, 1, 0]]
+                
+                var descr = MeshDescriptor()
+                descr.positions = MeshBuffers.Positions(positions[0...2])
+                descr.primitives = .triangles([0, 1, 2])
+                
+                let generatedModel = ModelEntity(mesh: try! .generate(from: [descr]))
+                
+                model = generatedModel
             }
         }
         
