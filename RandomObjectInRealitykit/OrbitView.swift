@@ -12,9 +12,10 @@ struct OrbitView: View {
     @Binding var model: ModelEntity
     
     private let camera = PerspectiveCamera()
-    private let radius: Float = 2
     private let dragspeed: Float = 0.01
     
+    @State private var radius: Float = 2
+    @State private var magnify_start_radius: Float = 2
     @State private var rotationAngle: Float = 0
     @State private var inclinationAngle: Float = 0
     @State private var dragstart_rotation: Float = 0
@@ -66,6 +67,7 @@ struct OrbitView: View {
     
     var body: some View {
         ARViewContainer(entity: model, camera: camera)
+            // ドラッグ
             .gesture(DragGesture().onChanged({ value in
                 let deltaX = Float(value.location.x - value.startLocation.x)
                 let deltaY = Float(value.location.y - value.startLocation.y)
@@ -82,6 +84,13 @@ struct OrbitView: View {
             }).onEnded({ _ in
                 dragstart_rotation = rotationAngle
                 dragstart_inclination = inclinationAngle
+            }))
+            // 拡大・縮小
+            .gesture(MagnificationGesture().onChanged({ value in
+                radius = magnify_start_radius / Float(value)
+                updateCamera()
+            }).onEnded({ _ in
+                magnify_start_radius = radius
             }))
     }
 }
