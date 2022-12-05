@@ -9,7 +9,7 @@ import SwiftUI
 import RealityKit
 
 struct OrbitView: View {
-    var entity: Entity
+    @Binding var model: ModelEntity
     
     private let camera = PerspectiveCamera()
     private let radius: Float = 2
@@ -24,8 +24,6 @@ struct OrbitView: View {
         let entity: Entity
         let camera: PerspectiveCamera
         
-        let anchor = AnchorEntity(world: .zero)
-        
         func makeUIView(context: Context) -> ARView {
             // arViewの初期化
             #if targetEnvironment(simulator)
@@ -33,17 +31,24 @@ struct OrbitView: View {
             #else
             let arView = ARView(frame: .zero, cameraMode: .nonAR, automaticallyConfigureSession: false)
             #endif
+            // アンカーを生成
+            let anchor = AnchorEntity(world: .zero)
             // カメラのポジションを変更
             camera.position = [0, 0, 2]
-            // アンカーにカメラとentityを追加
+            // アンカーにカメラを追加
             anchor.addChild(camera)
-            anchor.addChild(entity)
             // シーンにアンカーを追加
             arView.scene.addAnchor(anchor)
             return arView
         }
         
-        func updateUIView(_ uiView: ARView, context: Context) {}
+        func updateUIView(_ uiView: ARView, context: Context) {
+            let anchor = uiView.scene.anchors.first!
+            anchor.addChild(entity)
+            if anchor.children.count == 3 {
+                anchor.children.remove(at: 1)
+            }
+        }
     }
     
     @MainActor private func updateCamera() {
@@ -60,7 +65,7 @@ struct OrbitView: View {
     }
     
     var body: some View {
-        ARViewContainer(entity: entity, camera: camera)
+        ARViewContainer(entity: model, camera: camera)
             .gesture(DragGesture().onChanged({ value in
                 let deltaX = Float(value.location.x - value.startLocation.x)
                 let deltaY = Float(value.location.y - value.startLocation.y)
@@ -82,7 +87,9 @@ struct OrbitView: View {
 }
 
 struct OrbitView_Previews: PreviewProvider {
+    @State static var model = ModelEntity(mesh: .generateBox(size: 0.5))
+    
     static var previews: some View {
-        OrbitView(entity: ModelEntity(mesh: .generateBox(size: 0.5)))
+        OrbitView(model: $model)
     }
 }

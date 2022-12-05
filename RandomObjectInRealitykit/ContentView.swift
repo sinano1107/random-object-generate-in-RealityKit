@@ -9,9 +9,23 @@ import SwiftUI
 import RealityKit
 
 struct ContentView: View {
+    @State var model = ModelEntity(mesh: .generateBox(size: 0.5))
+    @State var isBox = true
+    
     var body: some View {
-        OrbitView(entity: ModelEntity(mesh: .generateBox(size: 0.5)))
-            .edgesIgnoringSafeArea(.all)
+        VStack {
+            OrbitView(model: $model)
+                .edgesIgnoringSafeArea(.all)
+            Button("トグル") {
+                isBox.toggle()
+                if isBox {
+                    model = ModelEntity(mesh: .generateBox(size: 0.5))
+                } else {
+                    model = ModelEntity(mesh: .generateSphere(radius: 0.5))
+                }
+            }
+        }
+        
     }
 }
 
