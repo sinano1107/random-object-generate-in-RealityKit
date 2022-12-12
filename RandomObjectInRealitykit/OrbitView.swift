@@ -14,8 +14,8 @@ struct OrbitView: View {
     private let camera = PerspectiveCamera()
     private let dragspeed: Float = 0.01
     
-    @State private var radius: Float = 2
-    @State private var magnify_start_radius: Float = 2
+    @State private var radius: Float = 4
+    @State private var magnify_start_radius: Float = 4
     @State private var rotationAngle: Float = 0
     @State private var inclinationAngle: Float = 0
     @State private var dragstart_rotation: Float = 0
@@ -35,7 +35,7 @@ struct OrbitView: View {
             // アンカーを生成
             let anchor = AnchorEntity(world: .zero)
             // カメラのポジションを変更
-            camera.position = [0, 0, 2]
+            camera.position = [0, 0, 4]
             // アンカーにカメラを追加
             anchor.addChild(camera)
             // シーンにアンカーを追加
@@ -96,7 +96,7 @@ struct OrbitView: View {
 }
 
 struct OrbitView_Previews: PreviewProvider {
-    @State static var model = ModelEntity(mesh: .generateBox(size: 0.5))
+    @State static var model = ModelEntity(mesh: .generateBox(size: 1))
     
     static var previews: some View {
         OrbitView(model: $model)
