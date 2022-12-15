@@ -8,13 +8,41 @@
 import SwiftUI
 import RealityKit
 
+struct Position {
+    let position: SIMD3<Float>
+    let color: UIColor
+    let name: String
+}
+
+func tetrahedron(_ p1: SIMD3<Float>, _ p2: SIMD3<Float>, _ p3: SIMD3<Float>, _ p4: SIMD3<Float>) -> MeshResource? {
+    // descriptor
+    var descr = MeshDescriptor()
+    descr.positions = MeshBuffers.Positions([
+        p1, p2, p3
+    ])
+    descr.primitives = .triangles([UInt32](0...2))
+    
+    do {
+        return try MeshResource.generate(from: [descr])
+    } catch {
+        print("四面体の生成に失敗しました")
+        return nil
+    }
+}
+
 struct ContentView: View {
     @State var model: ModelEntity
+    @State var message: String = ""
     
     init() {
-        let positions: [SIMD3<Float>] = [[1, 1, 1], [-1, -1, 1], [1, -1, -1], [-1, 1, -1]]
-        let colors: [UIColor] = [.red, .green, .blue, .yellow]
+        let positions: [Position] = [
+            Position(position: [1, 1, 1], color: .red, name: "赤"),
+            Position(position: [-1, -1, 1], color: .green, name: "緑"),
+            Position(position: [1, -1, -1], color: .blue, name: "青"),
+            Position(position: [-1, 1, -1], color: .yellow, name: "黄")
+        ]
         
+        /*
         // 正四面体を作成
         var descr = MeshDescriptor()
         // positions
@@ -44,12 +72,26 @@ struct ContentView: View {
         ])
         
         let generatedModel = ModelEntity(mesh: try! .generate(from: [descr]), materials: [SimpleMaterial()])
+         */
+        
+        // tetrahedronを活用
+        // ランダムな順序でポジションを渡す
+        let ps = positions.shuffled()
+        guard let resource = tetrahedron(ps[0].position, ps[1].position, ps[2].position, ps[3].position)
+        else {
+            model = ModelEntity(mesh: .generateBox(size: 1), materials: [SimpleMaterial()])
+            message = "四面体の生成に失敗しました"
+            return
+        }
+        // メッセージに順序を記載
+        message = "\(ps[0].name), \(ps[1].name), \(ps[2].name), \(ps[3].name)"
+        let generatedModel = ModelEntity(mesh: resource, materials: [SimpleMaterial()])
         
         // 頂点に球を追加
-        for (index, p) in positions.enumerated() {
-            let material = SimpleMaterial(color: colors[index], isMetallic: true)
+        for p in positions {
+            let material = SimpleMaterial(color: p.color, isMetallic: true)
             let sphere = ModelEntity(mesh: .generateSphere(radius: 0.05), materials: [material])
-            sphere.position = p
+            sphere.position = p.position
             generatedModel.addChild(sphere)
         }
         
@@ -57,8 +99,12 @@ struct ContentView: View {
     }
     
     var body: some View {
-        OrbitView(model: $model)
-            .edgesIgnoringSafeArea(.all)
+        VStack {
+            OrbitView(model: $model)
+                .edgesIgnoringSafeArea(.all)
+            Text(message)
+                .font(.title)
+        }
     }
 }
 
