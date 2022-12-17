@@ -44,11 +44,18 @@ func tetrahedron(_ p1: SIMD3<Float>, _ p2: SIMD3<Float>, _ p3: SIMD3<Float>, _ p
         normals += [SIMD3<Float>](repeating: -normalVector, count: 3)
     }
     
+    // MARK: - 残り3面を策定
+    for (index, pos_a) in positions.enumerated() {
+        let pos_b = positions[(index + 2) % 3]
+        positions += [p4, pos_a, pos_b]
+        let normal = cross(pos_a - p4, pos_b - pos_a)
+        normals += [SIMD3<Float>](repeating: normal, count: 3)
+    }
 
     // MARK: - 生成
     descr.positions = MeshBuffers.Positions(positions)
     descr.normals = MeshBuffers.Normals(normals)
-    descr.primitives = .triangles([UInt32](0...2))
+    descr.primitives = .triangles([UInt32](0...11))
     
     do {
         return try MeshResource.generate(from: [descr])
