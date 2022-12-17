@@ -32,7 +32,6 @@ func tetrahedron(_ p1: SIMD3<Float>, _ p2: SIMD3<Float>, _ p3: SIMD3<Float>, _ p
      負の時、別方向を向いているため1->2->3の結び方で正しい
      */
     let theta = dot(normalVector, vector1to4)
-    print(theta)
     
     if theta < 0 {
         // 正しいためそのまま代入
@@ -86,17 +85,7 @@ struct ContentView: View {
             message = "四面体の生成に失敗しました"
             return
         }
-        // メッセージに順序を記載
-        message = "\(ps[0].name), \(ps[1].name), \(ps[2].name), \(ps[3].name)"
         let generatedModel = ModelEntity(mesh: resource, materials: [SimpleMaterial()])
-        
-        // 頂点に球を追加
-        for p in positions {
-            let material = SimpleMaterial(color: p.color, isMetallic: true)
-            let sphere = ModelEntity(mesh: .generateSphere(radius: 0.05), materials: [material])
-            sphere.position = p.position
-            generatedModel.addChild(sphere)
-        }
         
         self.model = generatedModel
     }
@@ -107,6 +96,28 @@ struct ContentView: View {
                 .edgesIgnoringSafeArea(.all)
             Text(message)
                 .font(.title)
+            Button("ランダム生成") {
+                var positions: [SIMD3<Float>] = []
+                for _ in 1...4 {
+                    positions.append([
+                        Float.random(in: -1...1),
+                        Float.random(in: -1...1),
+                        Float.random(in: -1...1),
+                    ])
+                }
+                
+                guard let resource = tetrahedron(
+                    positions[0],
+                    positions[1],
+                    positions[2],
+                    positions[3]
+                ) else {
+                    message = "ランダム生成に失敗しました"
+                    return
+                }
+                
+                self.model = ModelEntity(mesh: resource, materials: [SimpleMaterial()])
+            }
         }
     }
 }
