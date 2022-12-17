@@ -77,38 +77,6 @@ struct ContentView: View {
             Position(position: [-1, 1, -1], color: .yellow, name: "黄")
         ]
         
-        /*
-        // 正四面体を作成
-        var descr = MeshDescriptor()
-        // positions
-        descr.positions = MeshBuffers.Positions([
-            positions[0], positions[1], positions[2],
-            positions[1], positions[0], positions[3],
-            positions[2], positions[3], positions[0],
-            positions[3], positions[2], positions[1],
-        ])
-        // primitives
-        descr.primitives = .triangles([
-            0, 1, 2,
-            3, 4, 5,
-            6, 7, 8,
-            9, 10, 11,
-        ])
-        // normals
-        let normal_0 = cross(positions[1] - positions[0], positions[2] - positions[1])
-        let normal_1 = cross(positions[0] - positions[1], positions[3] - positions[0])
-        let normal_2 = cross(positions[3] - positions[2], positions[0] - positions[3])
-        let normal_3 = cross(positions[2] - positions[3], positions[1] - positions[2])
-        descr.normals = MeshBuffers.Normals([
-            normal_0, normal_0, normal_0,
-            normal_1, normal_1, normal_1,
-            normal_2, normal_2, normal_2,
-            normal_3, normal_3, normal_3,
-        ])
-        
-        let generatedModel = ModelEntity(mesh: try! .generate(from: [descr]), materials: [SimpleMaterial()])
-         */
-        
         // tetrahedronを活用
         // ランダムな順序でポジションを渡す
         let ps = positions.shuffled()
