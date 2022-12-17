@@ -15,11 +15,39 @@ struct Position {
 }
 
 func tetrahedron(_ p1: SIMD3<Float>, _ p2: SIMD3<Float>, _ p3: SIMD3<Float>, _ p4: SIMD3<Float>) -> MeshResource? {
-    // descriptor
     var descr = MeshDescriptor()
-    descr.positions = MeshBuffers.Positions([
-        p1, p2, p3
-    ])
+    var positions: [SIMD3<Float>] = []
+    var normals: [SIMD3<Float>] = []
+    
+    // MARK: - 最初の面の向きを策定
+    /** 1->2->3の順で結んだ場合の法線（正規化済み）*/
+    let normalVector = normalize(cross(p2 - p1, p3 - p2))
+    
+    /** p1->p4のベクトル（正規化済み） */
+    let vector1to4 = normalize(p4 - p1)
+    
+    /**
+     normalVectorとvector1to4の内積
+     正の値の時、同じ方向を向いているため1->2->3の結び方は正しくない
+     負の時、別方向を向いているため1->2->3の結び方で正しい
+     */
+    let theta = dot(normalVector, vector1to4)
+    print(theta)
+    
+    if theta < 0 {
+        // 正しいためそのまま代入
+        positions += [p1, p2, p3]
+        normals += [SIMD3<Float>](repeating: normalVector, count: 3)
+    } else {
+        // 正しくないため反転して代入
+        positions += [p1, p3, p2]
+        normals += [SIMD3<Float>](repeating: -normalVector, count: 3)
+    }
+    
+
+    // MARK: - 生成
+    descr.positions = MeshBuffers.Positions(positions)
+    descr.normals = MeshBuffers.Normals(normals)
     descr.primitives = .triangles([UInt32](0...2))
     
     do {
