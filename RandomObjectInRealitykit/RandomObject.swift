@@ -56,3 +56,25 @@ func tetrahedron(_ p1: SIMD3<Float>, _ p2: SIMD3<Float>, _ p3: SIMD3<Float>, _ p
         return nil
     }
 }
+
+func randomObject() -> ModelEntity? {
+    var positions: [SIMD3<Float>] = []
+    for _ in 1...4 {
+        positions.append([
+            Float.random(in: -1...1),
+            Float.random(in: -1...1),
+            Float.random(in: -1...1),
+        ])
+    }
+    
+    guard let resource = tetrahedron(
+        positions[0],
+        positions[1],
+        positions[2],
+        positions[3]
+    ) else {
+        return nil
+    }
+    
+    return ModelEntity(mesh: resource, materials: [SimpleMaterial()])
+}

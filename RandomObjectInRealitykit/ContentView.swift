@@ -47,26 +47,11 @@ struct ContentView: View {
             Text(message)
                 .font(.title)
             Button("ランダム生成") {
-                var positions: [SIMD3<Float>] = []
-                for _ in 1...4 {
-                    positions.append([
-                        Float.random(in: -1...1),
-                        Float.random(in: -1...1),
-                        Float.random(in: -1...1),
-                    ])
-                }
-                
-                guard let resource = tetrahedron(
-                    positions[0],
-                    positions[1],
-                    positions[2],
-                    positions[3]
-                ) else {
+                guard let randomObject = randomObject() else {
                     message = "ランダム生成に失敗しました"
                     return
                 }
-                
-                self.model = ModelEntity(mesh: resource, materials: [SimpleMaterial()])
+                self.model = randomObject
             }
         }
     }
