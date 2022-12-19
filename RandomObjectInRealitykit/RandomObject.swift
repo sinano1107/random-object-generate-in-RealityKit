@@ -7,17 +7,18 @@
 
 import RealityKit
 
-func tetrahedron(_ p1: SIMD3<Float>, _ p2: SIMD3<Float>, _ p3: SIMD3<Float>, _ p4: SIMD3<Float>) -> MeshResource? {
-    var descr = MeshDescriptor()
+func tetrahedron(_ p: [SIMD3<Float>]) -> (positions: [SIMD3<Float>], normals: [SIMD3<Float>]) {
+    precondition(p.count == 4, "値が４つの配列を渡してください")
+    
     var positions: [SIMD3<Float>] = []
     var normals: [SIMD3<Float>] = []
     
-    // MARK: - 最初の面の向きを策定
+    // MARK: - 最初の面の向きを確定
     /** 1->2->3の順で結んだ場合の法線（正規化済み）*/
-    let normalVector = normalize(cross(p2 - p1, p3 - p2))
+    let normalVector = normalize(cross(p[1] - p[0], p[2] - p[1]))
     
     /** p1->p4のベクトル（正規化済み） */
-    let vector1to4 = normalize(p4 - p1)
+    let vector1to4 = normalize(p[3] - p[0])
     
     /**
      normalVectorとvector1to4の内積
@@ -28,33 +29,23 @@ func tetrahedron(_ p1: SIMD3<Float>, _ p2: SIMD3<Float>, _ p3: SIMD3<Float>, _ p
     
     if theta < 0 {
         // 正しいためそのまま代入
-        positions += [p1, p2, p3]
+        positions += [p[0], p[1], p[2]]
         normals += [SIMD3<Float>](repeating: normalVector, count: 3)
     } else {
         // 正しくないため反転して代入
-        positions += [p1, p3, p2]
+        positions += [p[0], p[2], p[1]]
         normals += [SIMD3<Float>](repeating: -normalVector, count: 3)
     }
     
-    // MARK: - 残り3面を策定
+    // MARK: - 残り3面を確定
     for (index, pos_a) in positions.enumerated() {
         let pos_b = positions[(index + 2) % 3]
-        positions += [p4, pos_a, pos_b]
-        let normal = cross(pos_a - p4, pos_b - pos_a)
+        positions += [p[3], pos_a, pos_b]
+        let normal = cross(pos_a - p[3], pos_b - pos_a)
         normals += [SIMD3<Float>](repeating: normal, count: 3)
     }
-
-    // MARK: - 生成
-    descr.positions = MeshBuffers.Positions(positions)
-    descr.normals = MeshBuffers.Normals(normals)
-    descr.primitives = .triangles([UInt32](0...11))
     
-    do {
-        return try MeshResource.generate(from: [descr])
-    } catch {
-        print("四面体の生成に失敗しました")
-        return nil
-    }
+    return (positions, normals)
 }
 
 func randomObject() -> ModelEntity? {
@@ -67,14 +58,18 @@ func randomObject() -> ModelEntity? {
         ])
     }
     
-    guard let resource = tetrahedron(
-        positions[0],
-        positions[1],
-        positions[2],
-        positions[3]
-    ) else {
+    let result = tetrahedron(positions)
+    
+    var descr = MeshDescriptor()
+    descr.positions = MeshBuffers.Positions(result.positions)
+    descr.normals = MeshBuffers.Normals(result.normals)
+    descr.primitives = .triangles([UInt32](0...11))
+    
+    do {
+        let resource = try MeshResource.generate(from: [descr])
+        return ModelEntity(mesh: resource, materials: [SimpleMaterial()])
+    } catch let error {
+        print("生成に失敗しました: \(error)")
         return nil
     }
-    
-    return ModelEntity(mesh: resource, materials: [SimpleMaterial()])
 }

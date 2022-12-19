@@ -8,36 +8,32 @@
 import SwiftUI
 import RealityKit
 
-struct Position {
-    let position: SIMD3<Float>
-    let color: UIColor
-    let name: String
-}
-
 struct ContentView: View {
     @State var model: ModelEntity
     @State var message: String = ""
     
     init() {
-        let positions: [Position] = [
-            Position(position: [1, 1, 1], color: .red, name: "赤"),
-            Position(position: [-1, -1, 1], color: .green, name: "緑"),
-            Position(position: [1, -1, -1], color: .blue, name: "青"),
-            Position(position: [-1, 1, -1], color: .yellow, name: "黄")
-        ]
+        // 正四面体のポジション
+        let positions: [SIMD3<Float>] = [[1, 1, 1], [-1, -1, 1], [1, -1, -1], [-1, 1, -1]]
         
-        // tetrahedronを活用
-        // ランダムな順序でポジションを渡す
-        let ps = positions.shuffled()
-        guard let resource = tetrahedron(ps[0].position, ps[1].position, ps[2].position, ps[3].position)
-        else {
-            model = ModelEntity(mesh: .generateBox(size: 1), materials: [SimpleMaterial()])
+        // tetrahedron関数で正しく結ぶ
+        let result = tetrahedron(positions)
+        
+        // descriptorに値を代入
+        var descr = MeshDescriptor()
+        descr.positions = MeshBuffers.Positions(result.positions)
+        descr.normals = MeshBuffers.Normals(result.normals)
+        descr.primitives = .triangles([UInt32](0...11))
+        
+        do {
+            // resourceを生成しmodelに代入
+            let resource = try MeshResource.generate(from: [descr])
+            model = ModelEntity(mesh: resource, materials: [SimpleMaterial()])
+        } catch {
+            // 失敗した場合は立方体を代入
             message = "四面体の生成に失敗しました"
-            return
+            model = ModelEntity(mesh: .generateBox(size: 1), materials: [SimpleMaterial()])
         }
-        let generatedModel = ModelEntity(mesh: resource, materials: [SimpleMaterial()])
-        
-        self.model = generatedModel
     }
     
     var body: some View {
@@ -45,7 +41,6 @@ struct ContentView: View {
             OrbitView(model: $model)
                 .edgesIgnoringSafeArea(.all)
             Text(message)
-                .font(.title)
             Button("ランダム生成") {
                 guard let randomObject = randomObject() else {
                     message = "ランダム生成に失敗しました"
