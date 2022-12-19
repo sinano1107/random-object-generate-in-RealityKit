@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9F4E91192950C80900961CDF /* RandomObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4E91182950C80900961CDF /* RandomObject.swift */; };
 		9F646B1B2939D58600A842B4 /* RandomObjectInRealitykitApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F646B1A2939D58600A842B4 /* RandomObjectInRealitykitApp.swift */; };
 		9F646B1D2939D58600A842B4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F646B1C2939D58600A842B4 /* ContentView.swift */; };
 		9F646B1F2939D58700A842B4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9F646B1E2939D58700A842B4 /* Assets.xcassets */; };
@@ -15,6 +16,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		9F4E91182950C80900961CDF /* RandomObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomObject.swift; sourceTree = "<group>"; };
 		9F646B172939D58600A842B4 /* RandomObjectInRealitykit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RandomObjectInRealitykit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9F646B1A2939D58600A842B4 /* RandomObjectInRealitykitApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomObjectInRealitykitApp.swift; sourceTree = "<group>"; };
 		9F646B1C2939D58600A842B4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -55,6 +57,7 @@
 			children = (
 				9F646B1A2939D58600A842B4 /* RandomObjectInRealitykitApp.swift */,
 				9F646B1C2939D58600A842B4 /* ContentView.swift */,
+				9F4E91182950C80900961CDF /* RandomObject.swift */,
 				9F7565C5293B6B00003C7961 /* OrbitView.swift */,
 				9F646B1E2939D58700A842B4 /* Assets.xcassets */,
 				9F646B202939D58700A842B4 /* Preview Content */,
@@ -141,6 +144,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9F7565C6293B6B00003C7961 /* OrbitView.swift in Sources */,
+				9F4E91192950C80900961CDF /* RandomObject.swift in Sources */,
 				9F646B1D2939D58600A842B4 /* ContentView.swift in Sources */,
 				9F646B1B2939D58600A842B4 /* RandomObjectInRealitykitApp.swift in Sources */,
 			);
