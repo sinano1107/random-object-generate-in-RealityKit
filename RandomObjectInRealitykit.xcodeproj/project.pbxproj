@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		9F4E91192950C80900961CDF /* RandomObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4E91182950C80900961CDF /* RandomObject.swift */; };
+		9F4E9135295299BC00961CDF /* Gaisin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4E9134295299BC00961CDF /* Gaisin.swift */; };
+		9F4E91372952A9FA00961CDF /* leastSquares_nonsquare.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4E91362952A9FA00961CDF /* leastSquares_nonsquare.swift */; };
+		9F4E913A2952AA5B00961CDF /* isPositiveDefinite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4E91392952AA5B00961CDF /* isPositiveDefinite.swift */; };
+		9F4E913C2952AA6C00961CDF /* symmetric_indefinite_general.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4E913B2952AA6C00961CDF /* symmetric_indefinite_general.swift */; };
 		9F646B1B2939D58600A842B4 /* RandomObjectInRealitykitApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F646B1A2939D58600A842B4 /* RandomObjectInRealitykitApp.swift */; };
 		9F646B1D2939D58600A842B4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F646B1C2939D58600A842B4 /* ContentView.swift */; };
 		9F646B1F2939D58700A842B4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9F646B1E2939D58700A842B4 /* Assets.xcassets */; };
@@ -17,6 +21,10 @@
 
 /* Begin PBXFileReference section */
 		9F4E91182950C80900961CDF /* RandomObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomObject.swift; sourceTree = "<group>"; };
+		9F4E9134295299BC00961CDF /* Gaisin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gaisin.swift; sourceTree = "<group>"; };
+		9F4E91362952A9FA00961CDF /* leastSquares_nonsquare.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = leastSquares_nonsquare.swift; sourceTree = "<group>"; };
+		9F4E91392952AA5B00961CDF /* isPositiveDefinite.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = isPositiveDefinite.swift; sourceTree = "<group>"; };
+		9F4E913B2952AA6C00961CDF /* symmetric_indefinite_general.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = symmetric_indefinite_general.swift; sourceTree = "<group>"; };
 		9F646B172939D58600A842B4 /* RandomObjectInRealitykit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RandomObjectInRealitykit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9F646B1A2939D58600A842B4 /* RandomObjectInRealitykitApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomObjectInRealitykitApp.swift; sourceTree = "<group>"; };
 		9F646B1C2939D58600A842B4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -36,6 +44,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		9F4E91382952AA3400961CDF /* Accelerate-Linear-Solvers */ = {
+			isa = PBXGroup;
+			children = (
+				9F4E913B2952AA6C00961CDF /* symmetric_indefinite_general.swift */,
+				9F4E91362952A9FA00961CDF /* leastSquares_nonsquare.swift */,
+				9F4E91392952AA5B00961CDF /* isPositiveDefinite.swift */,
+			);
+			path = "Accelerate-Linear-Solvers";
+			sourceTree = "<group>";
+		};
 		9F646B0E2939D58600A842B4 = {
 			isa = PBXGroup;
 			children = (
@@ -59,6 +77,8 @@
 				9F646B1C2939D58600A842B4 /* ContentView.swift */,
 				9F4E91182950C80900961CDF /* RandomObject.swift */,
 				9F7565C5293B6B00003C7961 /* OrbitView.swift */,
+				9F4E9134295299BC00961CDF /* Gaisin.swift */,
+				9F4E91382952AA3400961CDF /* Accelerate-Linear-Solvers */,
 				9F646B1E2939D58700A842B4 /* Assets.xcassets */,
 				9F646B202939D58700A842B4 /* Preview Content */,
 			);
@@ -144,9 +164,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				9F7565C6293B6B00003C7961 /* OrbitView.swift in Sources */,
+				9F4E913C2952AA6C00961CDF /* symmetric_indefinite_general.swift in Sources */,
 				9F4E91192950C80900961CDF /* RandomObject.swift in Sources */,
 				9F646B1D2939D58600A842B4 /* ContentView.swift in Sources */,
+				9F4E913A2952AA5B00961CDF /* isPositiveDefinite.swift in Sources */,
 				9F646B1B2939D58600A842B4 /* RandomObjectInRealitykitApp.swift in Sources */,
+				9F4E9135295299BC00961CDF /* Gaisin.swift in Sources */,
+				9F4E91372952A9FA00961CDF /* leastSquares_nonsquare.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
