@@ -14,16 +14,23 @@ struct OrbitView: View {
     private let camera = PerspectiveCamera()
     private let dragspeed: Float = 0.01
     
-    @State private var radius: Float = 6
-    @State private var magnify_start_radius: Float = 6
+    @State private var radius: Float
+    @State private var magnify_start_radius: Float
     @State private var rotationAngle: Float = 0
     @State private var inclinationAngle: Float = 0
     @State private var dragstart_rotation: Float = 0
     @State private var dragstart_inclination: Float = 0
     
+    init(_ model: Binding<ModelEntity>, radius: Float = 6) {
+        self._model = model
+        self.radius = radius
+        self.magnify_start_radius = radius
+    }
+    
     private struct ARViewContainer: UIViewRepresentable {
         let entity: Entity
         let camera: PerspectiveCamera
+        let firstRadius: Float
         
         func makeUIView(context: Context) -> ARView {
             // arViewの初期化
@@ -35,7 +42,7 @@ struct OrbitView: View {
             // アンカーを生成
             let anchor = AnchorEntity(world: .zero)
             // カメラのポジションを変更
-            camera.position = [0, 0, 6]
+            camera.position = [0, 0, firstRadius]
             // アンカーにカメラを追加
             anchor.addChild(camera)
             // シーンにアンカーを追加
@@ -66,7 +73,7 @@ struct OrbitView: View {
     }
     
     var body: some View {
-        ARViewContainer(entity: model, camera: camera)
+        ARViewContainer(entity: model, camera: camera, firstRadius: radius)
             // ドラッグ
             .gesture(DragGesture().onChanged({ value in
                 let deltaX = Float(value.location.x - value.startLocation.x)
@@ -99,6 +106,6 @@ struct OrbitView_Previews: PreviewProvider {
     @State static var model = ModelEntity(mesh: .generateBox(size: 1), materials: [SimpleMaterial()])
     
     static var previews: some View {
-        OrbitView(model: $model)
+        OrbitView($model)
     }
 }

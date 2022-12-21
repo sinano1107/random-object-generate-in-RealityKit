@@ -38,7 +38,7 @@ struct ContentView: View {
     
     var body: some View {
         VStack {
-            OrbitView(model: $model)
+            OrbitView($model)
                 .edgesIgnoringSafeArea(.all)
             Text(message)
             Button("ランダム生成") {
