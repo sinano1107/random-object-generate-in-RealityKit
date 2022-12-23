@@ -42,7 +42,7 @@ struct ContentView: View {
                 .edgesIgnoringSafeArea(.all)
             Text(message)
             Button("ランダム生成") {
-                guard let randomObject = randomObject() else {
+                guard let randomObject = randomObject(growthCount: 10) else {
                     message = "ランダム生成に失敗しました"
                     return
                 }

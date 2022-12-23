@@ -90,9 +90,11 @@ func growth(positions: [simd_float3], normals: [simd_float3]) -> (positions: [si
     return (positions, normals)
 }
 
-func randomObject() -> ModelEntity? {
+func randomObject(growthCount: Int = 0) -> ModelEntity? {
     // MARK: - 最初の四面体の生成
-    var positions: [SIMD3<Float>] = []
+    var positions = [simd_float3]()
+    var normals = [simd_float3]()
+    
     for _ in 1...4 {
         positions.append([
             Float.random(in: -1...1),
@@ -102,18 +104,24 @@ func randomObject() -> ModelEntity? {
     }
     
     let result = tetrahedron(positions)
+    positions = result.positions
+    normals = result.normals
     
     // MARK: - 成長
-    guard let growthRes = growth(positions: result.positions, normals: result.normals) else {
-        print("成長に失敗しました")
-        return nil
+    for _ in 0..<growthCount {
+        guard let result = growth(positions: positions, normals: normals) else {
+            print("成長に失敗しました")
+            return nil
+        }
+        positions = result.positions
+        normals = result.normals
     }
     
     // MARK: - Descrに代入し生成
     var descr = MeshDescriptor()
-    descr.positions = MeshBuffers.Positions(growthRes.positions)
-    descr.normals = MeshBuffers.Normals(growthRes.normals)
-    descr.primitives = .triangles([UInt32](0...UInt32(growthRes.positions.count)))
+    descr.positions = MeshBuffers.Positions(positions)
+    descr.normals = MeshBuffers.Normals(normals)
+    descr.primitives = .triangles([UInt32](0...UInt32(positions.count)))
     
     do {
         let resource = try MeshResource.generate(from: [descr])
