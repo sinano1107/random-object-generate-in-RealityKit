@@ -8,18 +8,15 @@
 import SwiftUI
 import RealityKit
 
-/// ３点を含む平面と別の２点を含む直線が平行でないか
-/// - Parameters:
-///   - planePoints: 平面を構成する３点
-///   - linePoints: 直線を構成する２点
-/// - Returns: true: 平行ではない, false: 平行である
-func isNotParallel(planePoints: [simd_float3], linePoints: [simd_float3]) -> Bool {
-    precondition(planePoints.count == 3, "planePointsには３つの値を代入してください")
+func doesCollideWithLineSegment(normal: simd_float3, linePoints: [simd_float3]) -> Bool {
     precondition(linePoints.count == 2, "linePointsには２つの値を代入してください")
-    let normal = cross(planePoints[1] - planePoints[0], planePoints[2] - planePoints[1])
-    let vector = linePoints[1] - linePoints[0]
-    let theta = dot(normal, vector)
-    return theta != 0
+    // 平行だったら衝突しない
+    if dot(normal, linePoints[1] - linePoints[0]) == 0 { return false }
+    
+    // linePoints[0], linePoints[1]は位置ベクトルだが、
+    // 平面上の原点(0,0,0)からの向きベクトルでもある。
+    // なのでそのまま向きベクトルとして利用している。
+    return dot(normal, linePoints[0]) * dot(normal, linePoints[1]) <= 0
 }
 
 struct CollisionDetection: View {
@@ -27,7 +24,7 @@ struct CollisionDetection: View {
     @State var message = "未入力"
     
     init() {
-        var result = (red: false, blue: false, yellow: false)
+        var result = (red: false, blue: false, yellow: false, green: false)
         let polygonPoints: [simd_float3] = [[1, 0, -1], [-1, 0, -1], [-1, 0, 1]]
         
         // polygon
@@ -45,32 +42,39 @@ struct CollisionDetection: View {
             end_sphere.setPosition(end, relativeTo: nil)
             model.addChild(start_sphere)
             model.addChild(end_sphere)
-            return isNotParallel(planePoints: polygonPoints, linePoints: [start, end])
+            return doesCollideWithLineSegment(normal: [0, 1, 0], linePoints: [start, end])
         }
         
-        // red 平行
+        // red
         do {
             let start = simd_float3(x: -1, y: 1, z: -1)
             let end = simd_float3(x: 1, y: 1, z: -1)
             result.red = check(start, end, .red)
         }
         
-        // blue 平行でない
+        // blue
         do {
             let start = simd_float3(x: -0.5, y: 1, z: -0.5)
             let end = simd_float3(x: -0.5, y: -1, z: -0.5)
             result.blue = check(start, end, .blue)
         }
         
-        // yellow 平行でない 線分としては衝突しない
+        // yellow
         do {
             let start = simd_float3(x: -1, y: 1, z: 0)
             let end = simd_float3(x: 1, y: 0.5, z: 0)
             result.yellow = check(start, end, .yellow)
         }
         
-        func m(_ v: Bool) -> String { v ? "平行でない" : "平行である"}
-        let message = "赤=\(m(result.red)), 青=\(m(result.blue)), 黄=\(m(result.yellow))"
+        // green
+        do {
+            let start = simd_float3(x: 1, y: 1, z: 0.5)
+            let end = simd_float3(x: 1, y: -1, z: 0.5)
+            result.green = check(start, end, .green)
+        }
+        
+        func m(_ v: Bool) -> String { v ? "衝突する" : "衝突しない"}
+        let message = "赤=\(m(result.red)), 青=\(m(result.blue)), 黄=\(m(result.yellow)), 緑=\(m(result.green))"
         _message = State(initialValue: message)
     }
     
