@@ -48,7 +48,50 @@ func tetrahedron(_ p: [SIMD3<Float>]) -> (positions: [SIMD3<Float>], normals: [S
     return (positions, normals)
 }
 
+func growth(positions: [simd_float3], normals: [simd_float3]) -> (positions: [simd_float3], normals: [simd_float3])? {
+    // 面の選択
+    let startIndex = Int.random(in: 0 ..< positions.count / 3) * 3
+    let endIndex = startIndex + 2
+    let selectedMeshPositions = positions[startIndex ... endIndex].map { $0 }
+    let selectedMeshNormal = normals[startIndex]
+    
+    // 選択した面の削除
+    var positions = positions
+    var normals = normals
+    positions.removeSubrange(startIndex ... endIndex)
+    normals.removeSubrange(startIndex ... endIndex)
+    
+    // 外心の算出
+    guard let circumcenter = circumcenter(selectedMeshPositions) else {
+        print("外心の算出に失敗しました")
+        return nil
+    }
+    
+    // 成長点ベクトルの取得
+    let radius = distance(circumcenter, selectedMeshPositions[0])
+    let vector = randomInHemisphere(radius: radius)
+    
+    // 成長点ベクトルの法線方向への回転
+    let quaternion = simd_quatf(from: [0, 1, 0], to: normalize(selectedMeshNormal))
+    let turnedVector = quaternion.act(vector)
+    
+    // 成長点の取得
+    let growthPoint = circumcenter + turnedVector
+    
+    // 成長点を接続
+    for i in 0...2 {
+        let a = selectedMeshPositions[i]
+        let b = selectedMeshPositions[(i + 1) % 3]
+        let normal = normalize(cross(a - growthPoint, b - a))
+        positions += [growthPoint, a, b]
+        normals += [simd_float3](repeating: normal, count: 3)
+    }
+
+    return (positions, normals)
+}
+
 func randomObject() -> ModelEntity? {
+    // MARK: - 最初の四面体の生成
     var positions: [SIMD3<Float>] = []
     for _ in 1...4 {
         positions.append([
@@ -60,10 +103,17 @@ func randomObject() -> ModelEntity? {
     
     let result = tetrahedron(positions)
     
+    // MARK: - 成長
+    guard let growthRes = growth(positions: result.positions, normals: result.normals) else {
+        print("成長に失敗しました")
+        return nil
+    }
+    
+    // MARK: - Descrに代入し生成
     var descr = MeshDescriptor()
-    descr.positions = MeshBuffers.Positions(result.positions)
-    descr.normals = MeshBuffers.Normals(result.normals)
-    descr.primitives = .triangles([UInt32](0...11))
+    descr.positions = MeshBuffers.Positions(growthRes.positions)
+    descr.normals = MeshBuffers.Normals(growthRes.normals)
+    descr.primitives = .triangles([UInt32](0...UInt32(growthRes.positions.count)))
     
     do {
         let resource = try MeshResource.generate(from: [descr])
