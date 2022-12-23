@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9F43CECC2956135E00ABB3B0 /* CollisionDetection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F43CECB2956135E00ABB3B0 /* CollisionDetection.swift */; };
 		9F4E91192950C80900961CDF /* RandomObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4E91182950C80900961CDF /* RandomObject.swift */; };
 		9F4E9135295299BC00961CDF /* Gaisin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4E9134295299BC00961CDF /* Gaisin.swift */; };
 		9F4E91372952A9FA00961CDF /* leastSquares_nonsquare.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4E91362952A9FA00961CDF /* leastSquares_nonsquare.swift */; };
@@ -21,6 +22,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		9F43CECB2956135E00ABB3B0 /* CollisionDetection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollisionDetection.swift; sourceTree = "<group>"; };
 		9F4E91182950C80900961CDF /* RandomObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomObject.swift; sourceTree = "<group>"; };
 		9F4E9134295299BC00961CDF /* Gaisin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gaisin.swift; sourceTree = "<group>"; };
 		9F4E91362952A9FA00961CDF /* leastSquares_nonsquare.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = leastSquares_nonsquare.swift; sourceTree = "<group>"; };
@@ -81,6 +83,7 @@
 				9F7565C5293B6B00003C7961 /* OrbitView.swift */,
 				9F4E9134295299BC00961CDF /* Gaisin.swift */,
 				9FCB65862952CA0B00E5CB5E /* RandomInSphere.swift */,
+				9F43CECB2956135E00ABB3B0 /* CollisionDetection.swift */,
 				9F4E91382952AA3400961CDF /* Accelerate-Linear-Solvers */,
 				9F646B1E2939D58700A842B4 /* Assets.xcassets */,
 				9F646B202939D58700A842B4 /* Preview Content */,
@@ -168,6 +171,7 @@
 			files = (
 				9F7565C6293B6B00003C7961 /* OrbitView.swift in Sources */,
 				9F4E913C2952AA6C00961CDF /* symmetric_indefinite_general.swift in Sources */,
+				9F43CECC2956135E00ABB3B0 /* CollisionDetection.swift in Sources */,
 				9F4E91192950C80900961CDF /* RandomObject.swift in Sources */,
 				9F646B1D2939D58600A842B4 /* ContentView.swift in Sources */,
 				9F4E913A2952AA5B00961CDF /* isPositiveDefinite.swift in Sources */,
