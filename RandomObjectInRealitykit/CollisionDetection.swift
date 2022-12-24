@@ -32,9 +32,16 @@ func doesItCollision(polygonPoints: [simd_float3], normal: simd_float3, linePoin
     let vector = (1 - a) * vector_point0 + a * vector_point1
     /** 衝突点 */
     let collisionPoint = polygonPoints[0] + vector
-    print(collisionPoint)
     
-    return true
+    // 衝突点がポリゴン内に含まれるか確認
+    let dot_results = [Int](0...2).map {
+        let start = polygonPoints[$0]
+        let end = polygonPoints[($0 + 1) % 3]
+        let cross = normalize(cross(end - start, collisionPoint - end))
+        return dot(normal, cross)
+    }
+    // 全てが正の値(鋭角)ならば衝突点はポリゴン内に含まれる
+    return dot_results.allSatisfy { $0 > 0 }
 }
 
 struct CollisionDetection: View {
@@ -43,7 +50,7 @@ struct CollisionDetection: View {
     
     init() {
         var result = (red: false, blue: false, yellow: false, green: false)
-        let polygonPoints: [simd_float3] = [[1, 0, -1], [-1, 0, -1], [-1, 1, 1]]
+        let polygonPoints: [simd_float3] = [[1, 0, -1], [-1, 0, -1], [-1, 0, 1]]
         let normal = normalize(cross(polygonPoints[1] - polygonPoints[0], polygonPoints[2] - polygonPoints[1]))
         
         // polygon
