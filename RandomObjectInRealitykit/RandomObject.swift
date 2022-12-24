@@ -48,16 +48,16 @@ func tetrahedron(_ p: [SIMD3<Float>]) -> (positions: [SIMD3<Float>], normals: [S
     return (positions, normals)
 }
 
-func growth(positions: [simd_float3], normals: [simd_float3]) -> (positions: [simd_float3], normals: [simd_float3])? {
+func growth(positions inputPositions: [simd_float3], normals inputNormals: [simd_float3]) -> (positions: [simd_float3], normals: [simd_float3])? {
     // 面の選択
-    let startIndex = Int.random(in: 0 ..< positions.count / 3) * 3
+    let startIndex = Int.random(in: 0 ..< inputPositions.count / 3) * 3
     let endIndex = startIndex + 2
-    let selectedMeshPositions = positions[startIndex ... endIndex].map { $0 }
-    let selectedMeshNormal = normals[startIndex]
+    let selectedMeshPositions = inputPositions[startIndex ... endIndex].map { $0 }
+    let selectedMeshNormal = inputNormals[startIndex]
     
     // 選択した面の削除
-    var positions = positions
-    var normals = normals
+    var positions = inputPositions
+    var normals = inputNormals
     positions.removeSubrange(startIndex ... endIndex)
     normals.removeSubrange(startIndex ... endIndex)
     
@@ -77,6 +77,24 @@ func growth(positions: [simd_float3], normals: [simd_float3]) -> (positions: [si
     
     // 成長点の取得
     let growthPoint = circumcenter + turnedVector
+    
+    // 成長点が既存のポリゴンと衝突するのならやめる
+    for i in 0...2 {
+        // growthPointと成長面を構成する一点
+        let linePoints = [growthPoint, selectedMeshPositions[i]]
+        for j in 0 ..< positions.count / 3 {
+            // 既存のすべてのポリゴン
+            let startIndex = j * 3
+            let endIndex = startIndex + 2
+            let polygonPoints = positions[startIndex ... endIndex].map { $0 }
+            let normal = normals[startIndex]
+            // 検証部分
+            if doesItCollision(polygonPoints: polygonPoints, normal: normal, linePoints: linePoints) {
+                print("衝突したので無視します: \(i) \(j) \(growthPoint)")
+                return (inputPositions, inputNormals)
+            }
+        }
+    }
     
     // 成長点を接続
     for i in 0...2 {
@@ -122,6 +140,7 @@ func randomObject(growthCount: Int = 0) -> ModelEntity? {
     descr.positions = MeshBuffers.Positions(positions)
     descr.normals = MeshBuffers.Normals(normals)
     descr.primitives = .triangles([UInt32](0...UInt32(positions.count)))
+    print("面数: \(positions.count / 3)")
     
     do {
         let resource = try MeshResource.generate(from: [descr])
