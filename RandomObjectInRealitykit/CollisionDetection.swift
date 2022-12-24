@@ -8,14 +8,32 @@
 import SwiftUI
 import RealityKit
 
-func doesCollideWithLineSegment(polygonPoints: [simd_float3], normal: simd_float3, linePoints: [simd_float3]) -> Bool {
+func doesItCollision(polygonPoints: [simd_float3], normal: simd_float3, linePoints: [simd_float3]) -> Bool {
     precondition(polygonPoints.count == 3, "polygonPointsには３つの値を代入してください")
     precondition(linePoints.count == 2, "linePointsには２つの値を代入してください")
     // 平行だったら衝突しない
     if dot(normal, linePoints[1] - linePoints[0]) == 0 { return false }
     
     // 2点が平面の同一方向にあるので衝突しない
-    if dot(normal, linePoints[0] - polygonPoints[0]) * dot(normal, linePoints[1] - polygonPoints[0]) >= 0 { return false }
+    let vector_point0 = linePoints[0] - polygonPoints[0]
+    let vector_point1 = linePoints[1] - polygonPoints[0]
+    let theta_point0 = dot(normal, vector_point0)
+    let theta_point1 = dot(normal, vector_point1)
+    if theta_point0 * theta_point1 >= 0 { return false }
+    
+    // 衝突点を算出
+    let normal_length = length(normal)
+    // 平面との各点の距離
+    let d_point0 = abs(theta_point0) / normal_length
+    let d_point1 = abs(theta_point1) / normal_length
+    /** 内分比 */
+    let a = d_point0 / (d_point0 + d_point1)
+    /** 衝突点に対するベクトル */
+    let vector = (1 - a) * vector_point0 + a * vector_point1
+    /** 衝突点 */
+    let collisionPoint = polygonPoints[0] + vector
+    print(collisionPoint)
+    
     return true
 }
 
@@ -25,7 +43,8 @@ struct CollisionDetection: View {
     
     init() {
         var result = (red: false, blue: false, yellow: false, green: false)
-        let polygonPoints: [simd_float3] = [[1, 0, -1], [-1, 0, -1], [-1, 0, 1]]
+        let polygonPoints: [simd_float3] = [[1, 0, -1], [-1, 0, -1], [-1, 1, 1]]
+        let normal = normalize(cross(polygonPoints[1] - polygonPoints[0], polygonPoints[2] - polygonPoints[1]))
         
         // polygon
         var descr = MeshDescriptor()
@@ -42,7 +61,7 @@ struct CollisionDetection: View {
             end_sphere.setPosition(end, relativeTo: nil)
             model.addChild(start_sphere)
             model.addChild(end_sphere)
-            return doesCollideWithLineSegment(polygonPoints: polygonPoints, normal: [0, 1, 0], linePoints: [start, end])
+            return doesItCollision(polygonPoints: polygonPoints, normal: normal, linePoints: [start, end])
         }
         
         // red
