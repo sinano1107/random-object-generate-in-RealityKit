@@ -67,33 +67,47 @@ func growth(positions inputPositions: [simd_float3], normals inputNormals: [simd
         return nil
     }
     
-    // 成長点ベクトルの取得
+    /** 半径 */
     let radius = distance(circumcenter, selectedMeshPositions[0])
-    let vector = randomInHemisphere(radius: radius)
     
-    // 成長点ベクトルの法線方向への回転
-    let quaternion = simd_quatf(from: [0, 1, 0], to: normalize(selectedMeshNormal))
-    let turnedVector = quaternion.act(vector)
+    /** 成長点を生成 */
+    func generateGrowthPoint() -> simd_float3 {
+        // 成長点ベクトルの取得
+        let vector = randomInHemisphere(radius: radius)
+        // 成長点ベクトルの法線方向への回転
+        let quaternion = simd_quatf(from: [0, 1, 0], to: normalize(selectedMeshNormal))
+        let turnedVector = quaternion.act(vector)
+        // 外心から成長点ベクトル方向の点を成長点とする
+        return circumcenter + turnedVector
+    }
     
-    // 成長点の取得
-    let growthPoint = circumcenter + turnedVector
-    
-    // 成長点が既存のポリゴンと衝突するのならやめる
-    for i in 0...2 {
-        // growthPointと成長面を構成する一点
-        let linePoints = [growthPoint, selectedMeshPositions[i]]
-        for j in 0 ..< positions.count / 3 {
-            // 既存のすべてのポリゴン
-            let startIndex = j * 3
-            let endIndex = startIndex + 2
-            let polygonPoints = positions[startIndex ... endIndex].map { $0 }
-            let normal = normals[startIndex]
-            // 検証部分
-            if doesItCollision(polygonPoints: polygonPoints, normal: normal, linePoints: linePoints) {
-                print("衝突したので無視します: \(i) \(j) \(growthPoint)")
-                return (inputPositions, inputNormals)
+    /// 成長点を採用した場合、既存のポリゴンと干渉（衝突）するか確認する
+    /// - Returns: 衝突したらtrue
+    func checkCollision() -> Bool {
+        for point_index in 0...2 {
+            /** 成長面を構成する一点（ループによってすべてチェックする）*/
+            let point = selectedMeshPositions[point_index]
+            let linePoints = [growthPoint, point]
+            for polygon_index in 0 ..< positions.count / 3 {
+                // 既存のポリゴンを指定する（ループによってすべてチェックする）
+                let startIndex = polygon_index * 3
+                let endIndex = startIndex + 2
+                let polygonPoints = positions[startIndex ... endIndex].map { $0 }
+                let normal = normals[startIndex] // 三点の法線はすべて同じ値なので適当に最初のを取り出す
+                if doesItCollision(polygonPoints: polygonPoints, normal: normal, linePoints: linePoints) {
+                    return true
+                }
             }
         }
+        return false
+    }
+    
+    // 成長点の取得
+    var growthPoint = generateGrowthPoint()
+    
+    // 成長点が衝突しなくなるまで試行を続ける
+    while checkCollision() {
+        growthPoint = generateGrowthPoint()
     }
     
     // 成長点を接続
