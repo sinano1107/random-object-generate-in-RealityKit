@@ -8,7 +8,7 @@
 import SwiftUI
 import RealityKit
 
-func circumcenter(_ positions: [SIMD3<Float>]) -> SIMD3<Float>? {
+func getCircumcenter(_ positions: [SIMD3<Float>]) -> SIMD3<Float>? {
     precondition(positions.count == 3, "値が３つの配列を渡してください")
     
     let dimension = (m: 3, n: 3)
@@ -58,7 +58,7 @@ struct Gaisin: View {
     func show(_ p1: SIMD3<Float>, _ p2: SIMD3<Float>, _ p3: SIMD3<Float>) {
         model = ModelEntity()
         
-        guard let circumcenter = circumcenter([p1, p2, p3]) else { return }
+        guard let circumcenter = getCircumcenter([p1, p2, p3]) else { return }
         
         // 各ポジションにsphereを配置
         for (index, p) in [p1, p2, p3, circumcenter].enumerated() {
