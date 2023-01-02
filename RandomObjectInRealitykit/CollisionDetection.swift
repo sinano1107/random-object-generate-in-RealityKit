@@ -45,8 +45,8 @@ func doesItCollision(polygonPoints: [simd_float3], normal: simd_float3, linePoin
 }
 
 struct CollisionDetection: View {
-    @State var model = ModelEntity()
-    @State var message = "未入力"
+    @State private var model = ModelEntity()
+    @State private var message = "未入力"
     
     init() {
         var result = (red: false, blue: false, yellow: false, green: false)

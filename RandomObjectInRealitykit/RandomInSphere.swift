@@ -23,7 +23,7 @@ func randomInHemisphere(radius: Float = 1) -> simd_float3 {
 }
 
 struct RandomInSphere: View {
-    @State var model = ModelEntity()
+    @State private var model = ModelEntity()
     
     func addSphere(_ b: simd_float3) {
         let sphere = ModelEntity(mesh: .generateSphere(radius: 0.05), materials: [SimpleMaterial()])

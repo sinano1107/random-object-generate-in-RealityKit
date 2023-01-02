@@ -9,8 +9,8 @@ import SwiftUI
 import RealityKit
 
 struct ContentView: View {
-    @State var model: ModelEntity
-    @State var message: String = ""
+    @State private var model: ModelEntity
+    @State private var message: String = ""
     
     init() {
         // 正四面体のポジション

@@ -53,7 +53,7 @@ func getCircumcenter(_ positions: [SIMD3<Float>]) -> SIMD3<Float>? {
 }
 
 struct Gaisin: View {
-    @State var model = ModelEntity()
+    @State private var model = ModelEntity()
     
     func show(_ p1: SIMD3<Float>, _ p2: SIMD3<Float>, _ p3: SIMD3<Float>) {
         model = ModelEntity()
